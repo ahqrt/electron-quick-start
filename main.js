@@ -1,10 +1,12 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const bridge = require('./bridge')
 const { desktopCapturerGetSources } = require('./media')
 
-function createWindow () {
+const { startCapture } = require('./bridge')
+
+function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -47,6 +49,11 @@ app.on('window-all-closed', function () {
 
 ipcMain.on('desktopCapturerGetSources', async () => {
   const res = await desktopCapturerGetSources()
-  // console.log('desktopCapturerGetSources res', res)
+  console.log('desktopCapturerGetSources res', res)
+  // const item = res[0]
+
+  startCapture(3145914, true)
+
+
   // const stream =
 })

@@ -1,38 +1,35 @@
-const ffi = require('ffi-napi')
-const path = require('path')
+const lib = require('bindings')('bjy_electron_plugin')
 
-// const audioCppUtils = require('./lib/lib/Release_x64/capture-app-audio.dll')
-// console.log('audioCppUtils', audioCppUtils)
+const instance = new lib.BJYCppPlugin()
 
-// function showText(text) {
-//     return new Buffer(text, 'utf-8').toString()
-// }
+instance.createEngineInstance()
 
-// const myUser32 = ffi.Library('user32.dll', {
-//     "MessageBoxW": ['int32', ['int32', 'string', 'string', 'int32']]
-// })
-
-// const isOk = myUser32.MessageBoxW(0, showText('i am'), showText('node js'), 1)
-
-const libPath = path.join(__dirname, './lib/lib/Release_x64/capture-app-audio.dll')
-
-console.log('libPath', libPath)
-
-const testLib = ffi.Library(libPath, {
-    "getShareInstance": ['pointer', []],
-    'destroyShareInstance': ['void', []]
-})
-
-const instance = testLib.getShareInstance()
-console.log('instance', instance.deref())
-console.log('instance StartCapture', instance.StartCapture)
-
-function startCapture(sourceId) {
-    if(instance) {
-        console.log('instance StartCapture', instance.StartCapture)
-    }
+function eventCallBack(data) {
+    console.log('audio data', Object.prototype.toString.call(data), data[0], data[1], data[2], data[3])
 }
 
-module.exports = {
+instance.SetEventCallback('onCapturedRawAudioFrameNode', eventCallBack)
 
+/**
+ * 
+ * @param {number} sid 
+ * @param {boolean} ignore 
+ */
+function startCapture(sid, ignore) {
+    instance.startAudioCapture(sid, ignore)
+}
+
+function stopCapture() {
+    instance.stopAudioCapture()
+}
+
+function destroy() {
+    instance.destroyEngineInstance()
+}
+
+
+module.exports = {
+    startCapture,
+    stopCapture,
+    destroy
 }

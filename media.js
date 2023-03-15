@@ -1,7 +1,7 @@
 const { desktopCapturer } = require('electron')
 
 async function desktopCapturerGetSources() {
-    const data =  { types: ['window', 'screen'] }
+    const data = { types: ['window', 'screen'] }
     const sources = await desktopCapturer.getSources(data)
     sources.forEach(source => {
         source.thumbnailBase64 = source.thumbnail.toDataURL()
