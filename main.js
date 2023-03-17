@@ -6,13 +6,21 @@ const { desktopCapturerGetSources } = require('./media')
 
 const { startCapture } = require('./bridge')
 
+let mainWindow
+
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      allowRunningInsecureContent: true,
+      nodeIntegration: true,
+      nodeIntegrationInSubFrames: true,
+      nativeWindowOpen: true,
+      contextIsolation: false,
+      enableRemoteModules: true
     }
   })
 
@@ -49,11 +57,9 @@ app.on('window-all-closed', function () {
 
 ipcMain.on('desktopCapturerGetSources', async () => {
   const res = await desktopCapturerGetSources()
-  console.log('desktopCapturerGetSources res', res)
-  // const item = res[0]
+  startCapture(330380, true, mainWindow)
+})
 
-  startCapture(3145914, true)
-
-
-  // const stream =
+ipcMain.on('setSourceCallBack', callback => {
+  bridge.setEventCallback(callback)
 })

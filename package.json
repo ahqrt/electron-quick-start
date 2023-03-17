@@ -17,9 +17,10 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^18.3.5"
+    "electron": "^18.3.15"
   },
   "dependencies": {
-    "bindings": "^1.5.0"
+    "bindings": "^1.5.0",
+    "pcm-player": "^0.0.15"
   }
 }

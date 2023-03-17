@@ -7,7 +7,7 @@
  */
 
 const { contextBridge, ipcRenderer } = require('electron')
-const { desktopCapturerGetSources, getScreenMedia } = require('./media')
+const { getScreenMedia } = require('./media')
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -21,7 +21,8 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  desktopCapturerGetSources: ipcRenderer.send('desktopCapturerGetSources'),
-  getScreenMedia
-})
+window.electronAPI = {
+  desktopCapturerGetSources: () => ipcRenderer.send('desktopCapturerGetSources'),
+  onSourceData: (callback) => ipcRenderer.send('setSourceCallBack', callback),
+  getScreenMedia,
+}

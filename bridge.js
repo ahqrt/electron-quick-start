@@ -1,22 +1,28 @@
-const lib = require('bindings')('bjy_electron_plugin')
+const lib = require('./plugin/bjy_electron_plugin.node')
 
 const instance = new lib.BJYCppPlugin()
 
 instance.createEngineInstance()
+let mainWindow
 
-function eventCallBack(data) {
-    console.log('audio data', Object.prototype.toString.call(data), data[0], data[1], data[2], data[3])
+function eventCallBack(data, sampleRate, channel) {
+    mainWindow.webContents.send('onAudioData', data, sampleRate, channel)
 }
 
-instance.SetEventCallback('onCapturedRawAudioFrameNode', eventCallBack)
+setEventCallback(eventCallBack)
+
+function setEventCallback(callback) {
+    instance.SetEventCallback('onCapturedRawAudioFrame', callback)
+}
 
 /**
  * 
  * @param {number} sid 
- * @param {boolean} ignore 
+ * @param {boolean} onlySourceId 
  */
-function startCapture(sid, ignore) {
-    instance.startAudioCapture(sid, ignore)
+function startCapture(sid, onlySourceId, mainWindowInMain) {
+    mainWindow = mainWindowInMain
+    instance.startAudioCapture(sid, onlySourceId)
 }
 
 function stopCapture() {
@@ -31,5 +37,6 @@ function destroy() {
 module.exports = {
     startCapture,
     stopCapture,
-    destroy
+    destroy,
+    setEventCallback
 }

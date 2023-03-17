@@ -6,5 +6,33 @@
  * to expose Node.js functionality from the main process.
  */
 
+const { ipcRenderer } = require('electron')
+const { convertArrayBufferToAudioBuffer, addAudioBufferToMediaStream, audioCtx, mediaStream } = require('./audioTransform')
+const PCMPlayer = require('./pcmTransform')
+
+let player
+function initPlayer(channels, sampleRate) {
+    player = new PCMPlayer({
+        inputCodec: 'Int16',
+        channels,
+        sampleRate,
+        flushTime: 0
+    })
+    window.pcmTransform = player
+
+    const destinationNode = window.pcmTransform.destinationNode
+    const stream = destinationNode.stream
+    const audioPlayer = document.getElementById('pcm-player')
+    audioPlayer.srcObject = stream
+}
+
+
+ipcRenderer.on('onAudioData', async (event, nodeBuffer, sampleRate, channel) => {
+    // const arrayBuffer = nodeBuffer.buffer.slice(nodeBuffer.byteOffset, nodeBuffer.byteOffset + nodeBuffer.byteLength)
+    if(!player) {
+        initPlayer(channel, sampleRate)
+    }
+    player.feed(nodeBuffer)
+})
 
 window.electronAPI.desktopCapturerGetSources()
